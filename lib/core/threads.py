@@ -186,13 +186,8 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             threads.append(thread)
 
         # And wait for them to all finish
-        alive = True
-        while alive:
-            alive = False
-            for thread in threads:
-                if thread.is_alive():
-                    alive = True
-                    time.sleep(0.1)
+        for thread in threads:
+            thread.join()
 
     except (KeyboardInterrupt, SqlmapUserQuitException) as ex:
         print()
@@ -222,7 +217,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
     except (SqlmapConnectionException, SqlmapValueException) as ex:
         print()
         kb.threadException = True
-        logger.error("thread %s: '%s'" % (threading.currentThread().getName(), ex))
+        logger.error("thread %s: '%s'" % (threading.current_thread().name, ex))
 
         if conf.get("verbose") > 1 and isinstance(ex, SqlmapValueException):
             traceback.print_exc()
